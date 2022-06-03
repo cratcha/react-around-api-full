@@ -1,0 +1,39 @@
+.modal__submit-button {
+  margin-top: 48px;
+  background: #000000;
+  border-radius: 2px;
+  font-family: Inter, Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  border: none;
+  width: 358px;
+  height: 50px;
+  color: #ffffff;
+}
+
+.modal__submit-button:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.modal__submit-button:disabled {
+  opacity: 0.2;
+  border: 1px solid #000000;
+  box-sizing: border-box;
+  border-radius: 2px;
+  background-color: white;
+  color: #000000;
+  cursor: default;
+}
+
+@media screen and (max-width: 500px) {
+  .modal__submit-button {
+    width: 238px;
+    height: 46px;
+    font-size: 14px;
+    line-height: 17px;
+    margin-top: 60px;
+  }
+}

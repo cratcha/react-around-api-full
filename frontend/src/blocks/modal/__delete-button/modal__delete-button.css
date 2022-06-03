@@ -1,0 +1,17 @@
+.modal__delete-button {
+  position: static;
+  background-image: none;
+  width: 358px;
+  height: 50px;
+  color: #fff;
+  background-color: #000;
+  border-radius: 2px;
+}
+
+@media screen and (max-width: 500px) {
+  .modal__delete-button {
+    margin: 36px 26px 26px;
+    width: 238px;
+    height: 46px;
+  }
+}

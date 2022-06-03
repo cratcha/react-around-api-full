@@ -1,0 +1,5 @@
+.modal__caption {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+}
