@@ -5,14 +5,18 @@ const {
   HTTP_CLIENT_ERROR_NOT_FOUND,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require('../utils/error');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const getUsers = (req, res) => {
   User.find({})
     .orFail()
     .then((users) => res.status(HTTP_SUCCESS_OK).send(users))
-    .catch(() => res
-      .status(HTTP_INTERNAL_SERVER_ERROR)
-      .send({ message: 'An error has occurred on the server' }));
+    .catch(() =>
+      res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .send({ message: 'An error has occurred on the server' })
+    );
 };
 
 const getUserbyId = (req, res) => {
@@ -30,17 +34,26 @@ const getUserbyId = (req, res) => {
       }
       res.status(HTTP_SUCCESS_OK).send(user);
     })
-    .catch(() => res
-      .status(HTTP_INTERNAL_SERVER_ERROR)
-      .send({ message: 'An error has occurred on the server' }));
+    .catch(() =>
+      res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .send({ message: 'An error has occurred on the server' })
+    );
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(HTTP_INTERNAL_SERVER_ERROR).send({ message: 'Error' }));
+  const { name, about, avatar, email, password } = req.body;
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new Error('The user with the provided email already exists');
+      } else {
+        return bcrypt.hash(password, 10);
+      }
+    })
+    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => res.status(400).send(err));
 };
 
 const updateUserProfile = (req, res) => {
@@ -53,7 +66,7 @@ const updateUserProfile = (req, res) => {
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
     .orFail()
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
@@ -90,7 +103,7 @@ const updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
     .orFail()
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
