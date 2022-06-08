@@ -3,6 +3,7 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const routes = require('./routes');
+require('dotenv').config();
 
 const app = express();
 
@@ -19,6 +20,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.listen(PORT, () => {
   // if everything works fine, the console will show which port the application is listening to

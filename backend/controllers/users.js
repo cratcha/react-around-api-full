@@ -8,13 +8,19 @@ const {
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const login = (req, res) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: '7d',
-      });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        {
+          expiresIn: '7d',
+        }
+      );
       res.send({ data: user.toJSON(), token });
     })
     .catch((err) => {
