@@ -36,14 +36,17 @@ function App() {
   const history = useHistory();
 
   React.useEffect(() => {
-    api
-      .getAppInfo()
-      .then(([cardData, userData]) => {
-        setCurrentUser(userData);
-        setCards(cardData);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    const token = localStorage.getItem('jwt');
+    if (token && isLoggedIn) {
+      api
+        .getAppInfo(token)
+        .then(([cardData, userData]) => {
+          setCurrentUser(userData.data);
+          setCards(cardData.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [isLoggedIn]);
 
   React.useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -93,7 +96,7 @@ function App() {
 
     // Send a request to the API and getting the updated card data
     api
-      .changeLikeStatus(card._id, !isLiked)
+      .changeLikeStatus(card._id, !isLiked, localStorage.getItem('jwt'))
       .then((newCard) => {
         setCards((state) =>
           state.map((item) => (item._id === card._id ? newCard : item))
@@ -104,7 +107,7 @@ function App() {
 
   function handleCardDelete(card) {
     api
-      .deleteCard(card._id)
+      .deleteCard(card._id, localStorage.getItem('jwt'))
       .then(() => {
         setCards((cards) => cards.filter((item) => item._id !== card._id));
       })
@@ -133,18 +136,19 @@ function App() {
 
   function handleAddPlaceSubmit(newCard) {
     api
-      .addNewCard(newCard)
+      .addNewCard(newCard, localStorage.getItem('jwt'))
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
   }
 
-  function onRegister(email, password) {
+  function onRegister({ email, password }) {
     auth
-      .register(email, password)
+      .register({ email, password })
       .then((res) => {
+        debugger;
         if (res.data._id) {
           setToolTipStatus('success');
           setisInfoToolTipOpen(true);

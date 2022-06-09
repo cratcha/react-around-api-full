@@ -26,7 +26,7 @@ class Api {
 
   editUserInfo({ name, about }) {
     return fetch(`${this._baseUrl}/users/me`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify({
         name,
@@ -37,7 +37,7 @@ class Api {
 
   addNewCard({ name, link }) {
     return fetch(`${this._baseUrl}/cards`, {
-      method: "POST",
+      method: 'POST',
       headers: this._headers,
       body: JSON.stringify({
         name,
@@ -48,21 +48,21 @@ class Api {
 
   deleteCard(cardID) {
     return fetch(`${this._baseUrl}/cards/${cardID}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: this._headers,
     }).then(this._handleServerResponse);
   }
 
   changeLikeStatus(cardID, like) {
     return fetch(`${this._baseUrl}/cards/likes/${cardID}`, {
-      method: like ? "PUT" : "DELETE",
+      method: like ? 'PUT' : 'DELETE',
       headers: this._headers,
     }).then(this._handleServerResponse);
   }
 
   updateAvatar({ avatar }) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify({ avatar }),
     }).then(this._handleServerResponse);
@@ -70,10 +70,10 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: "https://around.nomoreparties.co/v1/group-11",
+  baseUrl: 'http://localhost:3000',
   headers: {
-    authorization: "31f62eb8-38ec-46e4-a611-45b4f4685de4",
-    "Content-Type": "application/json",
+    authorization: `Bearer ${localStorage.getItem('jwt')}`,
+    'Content-Type': 'application/json',
   },
 });
 

@@ -9,6 +9,7 @@ class Auth {
   }
 
   register({ email, password }) {
+    debugger;
     return fetch(`${this._baseUrl}/signup`, {
       method: 'POST',
       headers: this._headers,
@@ -36,8 +37,9 @@ class Auth {
 }
 
 const auth = new Auth({
-  baseUrl: 'https://register.nomoreparties.co',
+  baseUrl: 'http://localhost:3000',
   headers: {
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 });
