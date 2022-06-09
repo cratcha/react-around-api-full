@@ -39,26 +39,18 @@ const createCard = (req, res) => {
 };
 
 // DELETE
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
-    .orFail()
-    .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
-    .catch((err) => {
-      if (err.name === 'CardNotFoundError') {
-        res
-          .status(HTTP_CLIENT_ERROR_NOT_FOUND)
-          .send({ message: 'Card not found' });
-      } else if (err.name === 'CastError') {
-        res
-          .status(HTTP_CLIENT_ERROR_BAD_REQUEST)
-          .send({ message: 'Invalid Card ID passed for deleting a card' });
+  Card.findById(cardId)
+    .orFail(() => new Error('Card ID not found'))
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        next(new Error("You cannot delete someone else's card"));
       } else {
-        res
-          .status(HTTP_INTERNAL_SERVER_ERROR)
-          .send({ message: 'An error has occured on the server' });
+        Card.deleteOne(card).then(() => res.send({ data: card }));
       }
-    });
+    })
+    .catch(next);
 };
 
 const likeCard = (req, res) => {
@@ -68,7 +60,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: currentUser } },
-    { new: true },
+    { new: true }
   )
     .orFail()
     .then((card) => res.status(HTTP_SUCCESS_OK).send({ data: card }))
@@ -96,7 +88,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: currentUser } },
-    { new: true },
+    { new: true }
   )
     .orFail()
     .then((card) => res.status(HTTP_SUCCESS_OK).send({ data: card }))
