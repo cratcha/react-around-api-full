@@ -72,7 +72,7 @@ const createUser = (req, res) => {
       }
     })
     .then((hash) => User.create({ name, about, avatar, email, password: hash }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((data) => res.status(201).send({ data }))
     .catch((err) => res.status(400).send(err));
 };
 

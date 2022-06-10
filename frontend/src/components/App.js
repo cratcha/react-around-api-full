@@ -148,7 +148,6 @@ function App() {
     auth
       .register({ email, password })
       .then((res) => {
-        debugger;
         if (res.data._id) {
           setToolTipStatus('success');
           setisInfoToolTipOpen(true);
