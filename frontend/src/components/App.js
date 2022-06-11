@@ -35,36 +35,34 @@ function App() {
 
   const history = useHistory();
 
-  React.useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    if (token && isLoggedIn) {
-      api
-        .getAppInfo(token)
-        .then(([cardData, userData]) => {
-          setCurrentUser(userData.data);
-          setCards(cardData.data);
+  const validateToken = React.useCallback(() => {
+    const jwt = localStorage.getItem('token');
+    if (jwt) {
+      auth
+        .validateUserToken(jwt)
+        .then((res) => {
+          if (!res) {
+            return;
+          }
+          setEmail(res.email);
+          setIsLoggedIn(true);
+          history.push('/');
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log('Uh-oh! Error occurred while validating the token.');
+          if (err.status === 400) {
+            console.log('Token not provided or provided in the wrong format.');
+          }
+          if (err.status === 401) {
+            console.log('The provided token is invalid.');
+          }
+        });
     }
-  }, [isLoggedIn]);
+  }, [history]);
 
   React.useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      auth
-        .checkToken(token)
-        .then((res) => {
-          if (res) {
-            setEmail(res.data.email);
-            setIsLoggedIn(true);
-            history.push('/');
-          } else {
-            localStorage.removeItem('jwt');
-          }
-        })
-        .catch((err) => console.log(err));
-    }
-  }, []);
+    validateToken();
+  }, [validateToken]);
 
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
@@ -168,9 +166,9 @@ function App() {
       .login({ email, password })
       .then((res) => {
         if (res.token) {
+          localStorage.setItem('jwt', res.token);
           setIsLoggedIn(true);
           setEmail(email);
-          localStorage.setItem('jwt', res.token);
           history.push('/');
         } else {
           setToolTipStatus('fail');

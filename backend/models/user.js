@@ -9,18 +9,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
     maxlength: 30,
+    default: 'Ekaterina Cratcha',
   },
   about: {
     type: String,
     required: true,
     minlength: 2,
     maxlength: 30,
+    default: 'Software Engineer',
   },
   avatar: {
     type: String,
     required: true,
+    default: 'https://pictures.s3.yandex.net/resources/avatar_1604080799.jpg',
     validate: {
-      validator: (v) => urlRegExp.test(v),
+      validator: validator.isURL,
       message: 'The "avatar" must be a valid url',
     },
   },
