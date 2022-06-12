@@ -109,7 +109,7 @@ function App() {
 
   function handleCardDelete(card) {
     api
-      .deleteCard(card._id, localStorage.getItem('jwt'))
+      .deleteCard(card._id)
       .then(() => {
         setCards((cards) => cards.filter((item) => item._id !== card._id));
       })
