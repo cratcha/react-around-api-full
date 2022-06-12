@@ -120,7 +120,6 @@ function App() {
     api
       .editUserInfo({ name, about })
       .then((newUserData) => {
-        debugger;
         setCurrentUser(newUserData);
         closeAllPopups();
       })
