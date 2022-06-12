@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const { urlRegExp } = require('../utils/regex');
+const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const cardsSchema = new mongoose.Schema({
   name: {
@@ -12,7 +14,7 @@ const cardsSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => urlRegExp.test(v),
+      validator: validator.isURL,
       message: 'The "link" must be a valid url',
     },
   },
@@ -22,7 +24,7 @@ const cardsSchema = new mongoose.Schema({
     required: true,
   },
   likes: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
     default: [],
   },
   createdAt: {

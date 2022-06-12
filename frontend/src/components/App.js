@@ -35,34 +35,36 @@ function App() {
 
   const history = useHistory();
 
-  const validateToken = React.useCallback(() => {
-    const jwt = localStorage.getItem('token');
-    if (jwt) {
-      auth
-        .validateUserToken(jwt)
-        .then((res) => {
-          if (!res) {
-            return;
-          }
-          setEmail(res.email);
-          setIsLoggedIn(true);
-          history.push('/');
+  React.useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token && isLoggedIn) {
+      api
+        .getAppInfo(token)
+        .then(([CardData, userData]) => {
+          setCurrentUser(userData);
+          setCards(CardData);
         })
-        .catch((err) => {
-          console.log('Uh-oh! Error occurred while validating the token.');
-          if (err.status === 400) {
-            console.log('Token not provided or provided in the wrong format.');
-          }
-          if (err.status === 401) {
-            console.log('The provided token is invalid.');
-          }
-        });
+        .catch((err) => console.log(err));
     }
-  }, [history]);
+  }, [isLoggedIn]);
 
   React.useEffect(() => {
-    validateToken();
-  }, [validateToken]);
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (res) {
+            setEmail(res.email);
+            setIsLoggedIn(true);
+            history.push('/');
+          } else {
+            localStorage.removeItem('jwt');
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, []);
 
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
@@ -88,20 +90,22 @@ function App() {
     setSelectedCard(card);
   }
 
-  function handleCardLike(card) {
-    // Check one more time if this card was already liked
-    const isLiked = card.likes.some((item) => item._id === currentUser._id);
-
-    // Send a request to the API and getting the updated card data
+  const handleCardLike = (card) => {
+    const isLiked = card.likes.some((cardId) => cardId === currentUser._id);
     api
-      .changeLikeStatus(card._id, !isLiked, localStorage.getItem('jwt'))
+      .changeLikeStatus(card._id, !isLiked)
       .then((newCard) => {
         setCards((state) =>
-          state.map((item) => (item._id === card._id ? newCard : item))
+          state.map((c) => (c._id === card._id ? newCard : c))
         );
       })
-      .catch((err) => console.log(err));
-  }
+      .catch((err) => {
+        console.log(
+          'Uh-oh! Error occurred while changing the like status of the card.'
+        );
+        console.log(err);
+      });
+  };
 
   function handleCardDelete(card) {
     api
@@ -116,6 +120,7 @@ function App() {
     api
       .editUserInfo({ name, about })
       .then((newUserData) => {
+        debugger;
         setCurrentUser(newUserData);
         closeAllPopups();
       })
@@ -136,7 +141,7 @@ function App() {
     api
       .addNewCard(newCard, localStorage.getItem('jwt'))
       .then((newCard) => {
-        setCards([newCard.data, ...cards]);
+        setCards([newCard, ...cards]);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -149,7 +154,11 @@ function App() {
         if (res.data._id) {
           setToolTipStatus('success');
           setisInfoToolTipOpen(true);
-          history.push('/signin');
+          const userData = {
+            email,
+            password,
+          };
+          onLogin(userData);
         } else {
           setToolTipStatus('fail');
           setisInfoToolTipOpen(true);

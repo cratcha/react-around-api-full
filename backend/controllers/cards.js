@@ -72,8 +72,8 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: currentUser } },
     { new: true }
   )
-    .orFail()
-    .then((card) => res.status(HTTP_SUCCESS_OK).send({ data: card }))
+    .orFail(new Error('Card not found'))
+    .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         res
@@ -101,7 +101,7 @@ const dislikeCard = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((card) => res.status(HTTP_SUCCESS_OK).send({ data: card }))
+    .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         res

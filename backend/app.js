@@ -2,8 +2,9 @@ const express = require('express');
 // listen to port 3000
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
-const routes = require('./routes');
 require('dotenv').config();
+const routes = require('./routes');
+
 console.log(process.env.NODE_ENV);
 const cors = require('cors');
 
