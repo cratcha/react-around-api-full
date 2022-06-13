@@ -64,11 +64,12 @@ const deleteCard = (req, res, next) => {
 };
 
 const likeCard = (req, res) => {
+  console.log(req.params);
   const currentUser = req.user._id;
-  const { cardId } = req.params;
+  const { id } = req.params;
 
   Card.findByIdAndUpdate(
-    { _id: cardId },
+    { _id: id },
     { $addToSet: { likes: currentUser } },
     { new: true }
   )
@@ -93,13 +94,9 @@ const likeCard = (req, res) => {
 
 const dislikeCard = (req, res) => {
   const currentUser = req.user._id;
-  const { cardId } = req.params;
+  const { id } = req.params;
 
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: currentUser } },
-    { new: true }
-  )
+  Card.findByIdAndUpdate(id, { $pull: { likes: currentUser } }, { new: true })
     .orFail()
     .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
