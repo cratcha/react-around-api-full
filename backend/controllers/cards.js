@@ -40,14 +40,14 @@ const createCard = (req, res) => {
 
 // DELETE
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
-  Card.findById({ _id: cardId })
+  const { id } = req.params;
+  Card.findById({ _id: id })
     .orFail(() => new Error('Card ID not found'))
     .then((card) => {
       if (!(card.owner.toString() === req.user._id)) {
         throw new Error("Don't have permission to delete");
       }
-      Card.findByIdAndRemove({ _id: cardId })
+      Card.findByIdAndRemove({ _id: id })
         .orFail()
         .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
         .catch(next);
@@ -64,7 +64,6 @@ const deleteCard = (req, res, next) => {
 };
 
 const likeCard = (req, res) => {
-  console.log(req.params);
   const currentUser = req.user._id;
   const { id } = req.params;
 
