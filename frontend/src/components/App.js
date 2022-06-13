@@ -120,7 +120,7 @@ function App() {
     api
       .editUserInfo({ name, about })
       .then((newUserData) => {
-        setCurrentUser(newUserData);
+        setCurrentUser(newUserData.data);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -130,7 +130,7 @@ function App() {
     api
       .updateAvatar(avatar)
       .then((newUserData) => {
-        setCurrentUser(newUserData);
+        setCurrentUser(newUserData.data);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
