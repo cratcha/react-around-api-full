@@ -5,35 +5,28 @@ const {
   HTTP_CLIENT_ERROR_NOT_FOUND,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require('../utils/error');
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
 
 // GET
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
+    .orFail(new NotFoundError('Cards are not found'))
     .then((cards) => res.status(HTTP_SUCCESS_OK).send(cards))
-    .catch(() => {
-      res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ messaage: 'An error has occured on the server' });
-    });
+    .catch(next);
 };
 
 // POST
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
       if (err.name === 'ValidatorError') {
-        res.status(HTTP_CLIENT_ERROR_BAD_REQUEST).send({
-          message: `${Object.values(err.errors)
-            .map((error) => error.message)
-            .join(', ')}`,
-        });
+        next(new BadRequestError('Missing or Invalid name or link'));
       } else {
-        res
-          .status(HTTP_INTERNAL_SERVER_ERROR)
-          .send({ message: 'An error has occured on the server' });
+        next(err);
       }
     });
 };
@@ -42,28 +35,20 @@ const createCard = (req, res) => {
 const deleteCard = (req, res, next) => {
   const { id } = req.params;
   Card.findById({ _id: id })
-    .orFail(() => new Error('Card ID not found'))
+    .orFail(() => new NotFoundError('Card ID not found'))
     .then((card) => {
       if (!(card.owner.toString() === req.user._id)) {
         throw new Error("Don't have permission to delete");
       }
       Card.findByIdAndRemove({ _id: id })
-        .orFail()
+        .orFail(new NotFoundError('Card ID not found'))
         .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
         .catch(next);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(HTTP_CLIENT_ERROR_BAD_REQUEST).send({
-          message: 'Invalid Card ID',
-        });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const currentUser = req.user._id;
   const { id } = req.params;
 
@@ -72,45 +57,29 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: currentUser } },
     { new: true }
   )
-    .orFail(new Error('Card not found'))
+    .orFail(new NotFoundError('Card ID not found'))
     .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res
-          .status(HTTP_CLIENT_ERROR_NOT_FOUND)
-          .send({ message: ' Card not found' });
-      } else if (err.name === 'CastError') {
-        res.status(HTTP_CLIENT_ERROR_BAD_REQUEST).send({
-          message: 'Invalid Card ID passed for liking a card',
-        });
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Invalid Card ID'));
       } else {
-        res.status(HTTP_INTERNAL_SERVER_ERROR).send({
-          message: ' An error has occurred on the server',
-        });
+        next(err);
       }
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const currentUser = req.user._id;
   const { id } = req.params;
 
   Card.findByIdAndUpdate(id, { $pull: { likes: currentUser } }, { new: true })
-    .orFail()
+    .orFail(new NotFoundError('Card ID not found'))
     .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res
-          .status(HTTP_CLIENT_ERROR_NOT_FOUND)
-          .send({ message: 'Card not found' });
-      } else if (err.name === 'CastError') {
-        res.status(HTTP_CLIENT_ERROR_BAD_REQUEST).send({
-          message: 'Invalid Card ID passed for disliking a card',
-        });
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Invalid Card ID'));
       } else {
-        res.status(HTTP_INTERNAL_SERVER_ERROR).send({
-          message: 'An error has occurred on the server',
-        });
+        next(err);
       }
     });
 };

@@ -30,6 +30,10 @@ app.use(cors());
 app.options('*', cors()); // Enable requests for all routes
 app.use(routes);
 
+app.use((err, req, res, next) => {
+  res.status(500).send({ message: 'An error occurred on the server' });
+});
+
 app.listen(PORT, () => {
   // if everything works fine, the console will show which port the application is listening to
   console.log(`App listening at port ${PORT}`);
