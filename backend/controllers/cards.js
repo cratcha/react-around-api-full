@@ -1,10 +1,5 @@
 const Card = require('../models/card');
-const {
-  HTTP_SUCCESS_OK,
-  HTTP_CLIENT_ERROR_BAD_REQUEST,
-  HTTP_CLIENT_ERROR_NOT_FOUND,
-  HTTP_INTERNAL_SERVER_ERROR,
-} = require('../utils/error');
+const { HTTP_SUCCESS_OK } = require('../utils/error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 
@@ -42,7 +37,7 @@ const deleteCard = (req, res, next) => {
       }
       Card.findByIdAndRemove({ _id: id })
         .orFail(new NotFoundError('Card ID not found'))
-        .then((card) => res.status(HTTP_SUCCESS_OK).send(card))
+        .then(() => res.status(HTTP_SUCCESS_OK).send(card))
         .catch(next);
     })
     .catch(next);
@@ -55,7 +50,7 @@ const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     { _id: id },
     { $addToSet: { likes: currentUser } },
-    { new: true }
+    { new: true },
   )
     .orFail(new NotFoundError('Card ID not found'))
     .then((card) => res.status(HTTP_SUCCESS_OK).send(card))

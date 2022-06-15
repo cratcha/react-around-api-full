@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const { urlRegExp } = require('../utils/regex');
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
 const cardsSchema = new mongoose.Schema({

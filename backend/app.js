@@ -3,10 +3,10 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 require('dotenv').config();
+const cors = require('cors');
 const routes = require('./routes');
 
 console.log(process.env.NODE_ENV);
-const cors = require('cors');
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'localhost3000');
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+    'Origin, X-Requested-With, Content-Type, Accept',
   );
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
   next();

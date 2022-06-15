@@ -1,16 +1,11 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  HTTP_SUCCESS_OK,
-  HTTP_CLIENT_ERROR_BAD_REQUEST,
-  HTTP_CLIENT_ERROR_NOT_FOUND,
-  HTTP_INTERNAL_SERVER_ERROR,
-} = require('../utils/error');
+const { HTTP_SUCCESS_OK } = require('../utils/error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -23,7 +18,7 @@ const login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         {
           expiresIn: '7d',
-        }
+        },
       );
       res.send({ data: user.toJSON(), token });
     })
@@ -55,18 +50,26 @@ const getUserbyId = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   User.findOne({ email })
     .then((user) => {
       if (user) {
         throw new ConflictError(
-          'The user with the provided email already exists'
+          'The user with the provided email already exists',
         );
       } else {
         return bcrypt.hash(password, 10);
       }
     })
-    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((data) => res.status(201).send({ data }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -94,7 +97,7 @@ const updateUserProfile = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .orFail(new NotFoundError('User ID not found'))
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
@@ -109,7 +112,7 @@ const updateUserProfile = (req, res, next) => {
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const currentUser = req.user._id;
   const { avatar } = req.body;
 
@@ -119,7 +122,7 @@ const updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .orFail(new NotFoundError('User ID not found'))
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
