@@ -2,9 +2,11 @@ const express = require('express');
 // listen to port 3000
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
-require('dotenv').config();
 const cors = require('cors');
+require('dotenv').config();
+
 const routes = require('./routes');
+const { errors } = require('celebrate');
 
 console.log(process.env.NODE_ENV);
 
@@ -20,7 +22,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'localhost3000');
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
+    'Origin, X-Requested-With, Content-Type, Accept'
   );
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
   next();
@@ -29,6 +31,7 @@ app.use((req, res, next) => {
 app.use(cors());
 app.options('*', cors()); // Enable requests for all routes
 app.use(routes);
+app.use(errors());
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: 'An error occurred on the server' });
