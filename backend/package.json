@@ -18,7 +18,6 @@
   "bugs": {
     "url": "https://github.com/cratcha/around-express/issues"
   },
-  "homepage": "https://github.com/cratcha/around-express#readme",
   "devDependencies": {
     "eslint": "^8.12.0",
     "eslint-config-airbnb-base": "^15.0.0",
