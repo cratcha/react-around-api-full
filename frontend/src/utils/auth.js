@@ -13,7 +13,7 @@ class Auth {
       method: 'POST',
       headers: this._headers,
       body: JSON.stringify({ email, password }),
-    }).then(() => this._handleServerResponse());
+    }).then(this._handleServerResponse);
   }
 
   login({ email, password }) {

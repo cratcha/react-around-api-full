@@ -153,11 +153,12 @@ function App() {
         if (res.data._id) {
           setToolTipStatus('success');
           setisInfoToolTipOpen(true);
-          const userData = {
-            email,
-            password,
-          };
-          onLogin(userData);
+          // const userData = {
+          //   email,
+          //   password,
+          // };
+          // onLogin(userData);
+          history.push('/login');
         } else {
           setToolTipStatus('fail');
           setisInfoToolTipOpen(true);
