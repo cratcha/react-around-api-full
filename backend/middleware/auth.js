@@ -6,6 +6,8 @@ const UnauthorizedError = require('../errors/unauthorized-error');
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
+  console.log(req.headers);
+
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return next(new UnauthorizedError('Authorization Required11'));
   }

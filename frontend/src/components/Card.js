@@ -21,7 +21,6 @@ function Card({ card, onCardClick, onCardDelete, onCardLike }) {
     isOwn ? 'element__trash' : 'element__trash_hidden'
   }`;
 
-  console.log(card.likes);
   const isLiked = card.likes.some((cardId) => cardId === currentUser._id);
   const cardLikeButtonClassName = `element__like-button ${
     isLiked && 'element__like-button_activated'

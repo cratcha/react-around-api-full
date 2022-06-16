@@ -93,7 +93,7 @@ function App() {
   const handleCardLike = (card) => {
     const isLiked = card.likes.some((cardId) => cardId === currentUser._id);
     api
-      .changeLikeStatus(card._id, !isLiked)
+      .changeLikeStatus(card._id, !isLiked, localStorage.getItem('jwt'))
       .then((newCard) => {
         setCards((state) =>
           state.map((c) => (c._id === card._id ? newCard : c))
@@ -109,7 +109,7 @@ function App() {
 
   function handleCardDelete(card) {
     api
-      .deleteCard(card._id)
+      .deleteCard(card._id, localStorage.getItem('jwt'))
       .then(() => {
         setCards((cards) => cards.filter((item) => item._id !== card._id));
       })
@@ -118,7 +118,7 @@ function App() {
 
   function handleUpdateUser({ name, about }) {
     api
-      .editUserInfo({ name, about })
+      .editUserInfo({ name, about }, localStorage.getItem('jwt'))
       .then((newUserData) => {
         setCurrentUser(newUserData.data);
         closeAllPopups();
@@ -126,9 +126,9 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateAvatar(avatar) {
+  function handleUpdateAvatar({ avatar }) {
     api
-      .updateAvatar(avatar)
+      .updateAvatar({ avatar }, localStorage.getItem('jwt'))
       .then((newUserData) => {
         setCurrentUser(newUserData.data);
         closeAllPopups();

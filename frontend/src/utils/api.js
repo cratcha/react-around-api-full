@@ -8,26 +8,35 @@ class Api {
     return res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
   }
 
-  getAppInfo() {
-    return Promise.all([this.getInitialCards(), this.getUserInfo()]);
+  getAppInfo(token) {
+    return Promise.all([this.getInitialCards(token), this.getUserInfo(token)]);
   }
 
-  getInitialCards() {
+  getInitialCards(token) {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
     }).then(this._handleServerResponse);
   }
 
-  getUserInfo() {
+  getUserInfo(token) {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
     }).then(this._handleServerResponse);
   }
 
-  editUserInfo({ name, about }) {
+  editUserInfo({ name, about }, token) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
       body: JSON.stringify({
         name,
         about,
@@ -35,10 +44,13 @@ class Api {
     }).then(this._handleServerResponse);
   }
 
-  addNewCard({ name, link }) {
+  addNewCard({ name, link }, token) {
     return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
       body: JSON.stringify({
         name,
         link,
@@ -46,24 +58,33 @@ class Api {
     }).then(this._handleServerResponse);
   }
 
-  deleteCard(cardId) {
+  deleteCard(cardId, token) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
     }).then(this._handleServerResponse);
   }
 
-  changeLikeStatus(cardId, isLiked) {
+  changeLikeStatus(cardId, isLiked, token) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: isLiked ? 'PUT' : 'DELETE',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
     }).then(this._handleServerResponse);
   }
 
-  updateAvatar({ avatar }) {
+  updateAvatar({ avatar }, token) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...this._headers,
+      },
       body: JSON.stringify({ avatar }),
     }).then(this._handleServerResponse);
   }
@@ -72,7 +93,6 @@ class Api {
 const api = new Api({
   baseUrl: 'http://localhost:3000',
   headers: {
-    authorization: `Bearer ${localStorage.getItem('jwt')}`,
     'Content-Type': 'application/json',
   },
 });

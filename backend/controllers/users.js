@@ -18,7 +18,7 @@ const login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         {
           expiresIn: '7d',
-        },
+        }
       );
       res.send({ data: user.toJSON(), token });
     })
@@ -50,26 +50,26 @@ const getUserbyId = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
+  const { name, about, avatar, email, password } = req.body;
   User.findOne({ email })
     .then((user) => {
       if (user) {
         throw new ConflictError(
-          'The user with the provided email already exists',
+          'The user with the provided email already exists'
         );
       } else {
         return bcrypt.hash(password, 10);
       }
     })
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
+    .then((hash) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
     .then((data) => res.status(201).send({ data }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -97,7 +97,7 @@ const updateUserProfile = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
     .orFail(new NotFoundError('User ID not found'))
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
@@ -116,13 +116,13 @@ const updateAvatar = (req, res, next) => {
   const currentUser = req.user._id;
   const { avatar } = req.body;
 
-  User.findOneAndUpdate(
+  User.findByIdAndUpdate(
     currentUser,
     { avatar },
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
     .orFail(new NotFoundError('User ID not found'))
     .then((user) => res.status(HTTP_SUCCESS_OK).send({ data: user }))
