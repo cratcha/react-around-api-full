@@ -1,7 +1,7 @@
 {
   "name": "around-express",
   "version": "1.0.0",
-  "description": "`/data` — JSON files to temporarily emulate database integration.",
+  "description": "A package to create a server with an API",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
