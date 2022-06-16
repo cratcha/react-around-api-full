@@ -2,6 +2,7 @@ const express = require('express');
 // listen to port 3000
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
+const { requestLogger, errorLogger } = require('./middleware/logger');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -30,7 +31,9 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.options('*', cors()); // Enable requests for all routes
+app.use(requestLogger);
 app.use(routes);
+app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
