@@ -35,8 +35,13 @@ class Auth {
   }
 }
 
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.cratcha.students.nomoreparties.sbs'
+    : 'http://localhost:3000';
+
 const auth = new Auth({
-  baseUrl: 'https://api.cratcha.students.nomoreparties.sbs',
+  baseUrl: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
