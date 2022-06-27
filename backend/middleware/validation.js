@@ -1,6 +1,6 @@
 const { Joi, celebrate } = require('celebrate');
 const validator = require('validator');
-//const { ObjectId } = require('mongoose').Types;
+const { ObjectId } = require('mongoose').Types;
 
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
@@ -46,17 +46,59 @@ const validateLogin = celebrate({
     }),
   }),
 });
-// const validateRequestAuth = celebrate({
-//   headers: Joi.object()
-//     .keys({
-//       authorization: Joi.string().required().messages({
-//         'string.empty': 'Authorization required',
-//       }),
-//     })
-//     .unknown(true),
-// });
+
+const validateCardId = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (ObjectId.isValid(value)) {
+          return value;
+        }
+        return helpers.message('Invalid Card ID');
+      }),
+  }),
+});
+
+const validateUserId = celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (ObjectId.isValid(value)) {
+          return value;
+        }
+        return helpers.message('Invalid User ID');
+      }),
+  }),
+});
+
+const validateCard = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).messages({
+      'string.min': 'The name field needs at least 2 characters',
+      'string.max': 'The maximum length of the name field is 30 characters',
+      'string.empty': 'The name field is empty',
+    }),
+    link: Joi.string().custom(validateURL),
+  }),
+});
+
+const validateRequestAuth = celebrate({
+  headers: Joi.object()
+    .keys({
+      authorization: Joi.string().required().messages({
+        'string.empty': 'Authorization required',
+      }),
+    })
+    .unknown(true),
+});
 
 module.exports = {
   validateLogin,
   validateUser,
+  validateRequestAuth,
+  validateUserId,
+  validateCardId,
+  validateCard,
 };
