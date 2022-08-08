@@ -11,7 +11,7 @@
 6. MongoDB
 7. JWT Authorization
 
-<img src="/frontend/public/AroundUs-Screenshot.png" width=600>
+![website screenshot](https://github.com/cratcha/react-around-api-full/blob/main/frontend/public/AroundUs_Screenshot.png?raw=true)
 
 ## REST API Endpoints
 `POST`       `/signup`              Registers a user                       
